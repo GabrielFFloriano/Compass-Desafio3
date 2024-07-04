@@ -1,8 +1,13 @@
-package com.example.ecommerce.model;
+package com.example.ecommerce.models;
 
-import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 @Entity
 public class Venda {
@@ -11,7 +16,7 @@ public class Venda {
     private Long id;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime data = LocalDateTime.now();
+    private Instant data = Instant.now();
 
     @Column(nullable = false)
     private BigDecimal total;
@@ -28,7 +33,7 @@ public class Venda {
 		return id;
 	}
 
-	public LocalDateTime getData() {
+	public Instant getData() {
 		return data;
 	}
 

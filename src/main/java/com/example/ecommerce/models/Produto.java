@@ -1,12 +1,11 @@
-package com.example.ecommerce.model;
+package com.example.ecommerce.models;
 
 
 import java.math.BigDecimal;
 
-import org.springframework.data.annotation.Id;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
 @Entity
@@ -18,15 +17,19 @@ public class Produto {
 	
     @Column(nullable = false)
     @NotBlank(message = "Nome do produto é obrigatório")
-    private String name;
+    private String nome;
     
     @Column
     private String descricao;
     
     @Column(nullable = false)
     @DecimalMin(value = "0.01", message = "Preço do produto deve ser positivo")
-    private BigDecimal price;
+    private BigDecimal preco;
 
+    @Column(nullable = false)
+    @Min(value = 0, message = "Estoque do produto não pode ser negativo")
+    private Integer estoque;
+    
     @Column(nullable = false)
     private boolean ativo = true;
 
@@ -34,12 +37,12 @@ public class Produto {
 		return id;
 	}
 
-	public String getName() {
-		return name;
+	public String getNome() {
+		return nome;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setNome(String nome) {
+		this.nome = nome;
 	}
 
 	public String getDescricao() {
@@ -50,13 +53,21 @@ public class Produto {
 		this.descricao = descricao;
 	}
 
-	public BigDecimal getPrice() {
-		return price;
+	public BigDecimal getPreco() {
+		return preco;
 	}
 
-	public void setPrice(BigDecimal price) {
-		this.price = price;
+	public void setPreco(BigDecimal preco) {
+		this.preco = preco;
 	}
+
+    public Integer getEstoque() {
+        return estoque;
+    }
+
+    public void setEstoque(Integer estoque) {
+        this.estoque = estoque;
+    }
 
 	public boolean isAtivo() {
 		return ativo;
