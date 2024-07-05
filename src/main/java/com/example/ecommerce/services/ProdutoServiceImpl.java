@@ -19,24 +19,25 @@ public class ProdutoServiceImpl implements ProdutoService {
 
 	@Autowired
 	private ProdutoRepository repository;
-	
+
 	@Autowired
 	private ProdutoMapper mapper;
-	
+
 	@Override
-    @Transactional
+	@Transactional
 	public ProdutoDTO criar(ProdutoDTO produtoDTO) {
 		Produto produto = mapper.toEntity(produtoDTO);
 		Produto salvo = repository.save(produto);
 		return mapper.toDTO(salvo);
 	}
 
-
 	@Override
-    @Transactional
+	@Transactional
 	public ProdutoDTO atualizar(Long id, ProdutoDTO produtoDTO) {
-		Produto produto = mapper.toEntity(obterPorId(id));
+		Produto produto = repository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado com o ID: " + id));
 		produto.setNome(produtoDTO.nome());
+	    produto.setDescricao(produtoDTO.descricao()); 
 		produto.setPreco(produtoDTO.preco());
 		produto.setEstoque(produtoDTO.estoque());
 		Produto atualizado = repository.save(produto);
@@ -44,20 +45,23 @@ public class ProdutoServiceImpl implements ProdutoService {
 	}
 
 	@Override
-    @Transactional
+	@Transactional
 	public void mudarStatus(Long id) {
 		Produto produto = mapper.toEntity(obterPorId(id));
-		boolean status = produto.isAtivo()? false : true;
+		boolean status = produto.isAtivo() ? false : true;
 		produto.setAtivo(status);
 		repository.save(produto);
 	}
 
 	@Override
-    @Transactional
+	@Transactional
 	public void deletar(Long id) {
-		Produto produto = mapper.toEntity(obterPorId(id));
-		//TODO verificar se está numa venda
-		repository.delete(produto);
+		// TODO verificar se está numa venda
+		if (repository.existsById(id)) {
+			repository.deleteById(id);
+		} else {
+			throw new ResourceNotFoundException("Produto não encontrado com o ID: " + id);
+		}
 	}
 
 	@Override
@@ -69,10 +73,8 @@ public class ProdutoServiceImpl implements ProdutoService {
 
 	@Override
 	public List<ProdutoDTO> listar() {
-        List<Produto> produtos = repository.findAll();
-        return produtos.stream()
-                .map(mapper::toDTO)
-                .collect(Collectors.toList());
+		List<Produto> produtos = repository.findAll();
+		return produtos.stream().map(mapper::toDTO).collect(Collectors.toList());
 	}
 
 }
