@@ -38,7 +38,7 @@ public class ProdutoServiceImpl implements ProdutoService {
 				.orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado com o ID: " + id));
 		produto.setNome(produtoDTO.nome());
 	    produto.setDescricao(produtoDTO.descricao()); 
-		produto.setPreco(produtoDTO.preco());
+		produto.setPreco(produtoDTO.preco()); //TODO validação preço
 		produto.setEstoque(produtoDTO.estoque());
 		Produto atualizado = repository.save(produto);
 		return mapper.toDTO(atualizado);
