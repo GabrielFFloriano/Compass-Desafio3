@@ -10,6 +10,7 @@ import com.example.ecommerce.dtos.ProdutoDTO;
 import com.example.ecommerce.exceptions.ResourceNotFoundException;
 import com.example.ecommerce.mapper.ProdutoMapper;
 import com.example.ecommerce.models.Produto;
+import com.example.ecommerce.models.Venda;
 import com.example.ecommerce.repositories.ProdutoRepository;
 
 import jakarta.transaction.Transactional;
@@ -36,10 +37,7 @@ public class ProdutoServiceImpl implements ProdutoService {
 	public ProdutoDTO atualizar(Long id, ProdutoDTO produtoDTO) {
 		Produto produto = repository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado com o ID: " + id));
-		produto.setNome(produtoDTO.nome());
-	    produto.setDescricao(produtoDTO.descricao()); 
-		produto.setPreco(produtoDTO.preco()); //TODO validação preço
-		produto.setEstoque(produtoDTO.estoque());
+		mapper.updateFromDTO(produtoDTO, produto);
 		Produto atualizado = repository.save(produto);
 		return mapper.toDTO(atualizado);
 	}
@@ -57,11 +55,10 @@ public class ProdutoServiceImpl implements ProdutoService {
 	@Transactional
 	public void deletar(Long id) {
 		// TODO verificar se está numa venda
-		if (repository.existsById(id)) {
-			repository.deleteById(id);
-		} else {
-			throw new ResourceNotFoundException("Produto não encontrado com o ID: " + id);
-		}
+		Produto produto = repository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Venda não encontrada com o ID: " + id));
+		repository.delete(produto);
+
 	}
 
 	@Override
