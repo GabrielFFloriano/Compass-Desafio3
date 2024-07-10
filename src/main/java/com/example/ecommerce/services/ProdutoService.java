@@ -11,4 +11,5 @@ public interface ProdutoService {
     void mudarStatus(Long id);
     void deletar(Long id);
     List<ProdutoDTO> listar();
+	void limparCacheProdutos();
 }

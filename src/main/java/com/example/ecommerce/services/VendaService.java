@@ -15,4 +15,5 @@ public interface VendaService {
     List<VendaDTO> filtrarVendasPorData(Instant startDate, Instant endDate);
     List<VendaDTO> gerarRelatorioSemanal();
     List<VendaDTO> gerarRelatorioMensal();
+	void limparCacheVendas();
 }
