@@ -3,15 +3,17 @@ package com.example.ecommerce.models;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Min;
@@ -36,18 +38,22 @@ public class Produto {
     @Digits(integer = 10, fraction = 2, message = "Preço do produto deve ter no máximo duas casas decimais")
     private BigDecimal preco;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "INT DEFAULT 0")
     @Min(value = 0, message = "Estoque do produto não pode ser negativo")
     private Integer estoque;
     
     @Column(nullable = false)
     private boolean ativo = true;
 
-    @ManyToMany(mappedBy = "produtos", fetch = FetchType.EAGER)
-    private Set<Venda> vendas = new HashSet<>();
+    @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private Set<ProdutoVenda> vendas = new HashSet<>();
     
 	public Long getId() {
 		return id;
+	}
+	
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getNome() {
@@ -90,8 +96,25 @@ public class Produto {
 		this.ativo = ativo;
 	}
 
-	public Set<Venda> getVendas() {
+	public Set<ProdutoVenda> getVendas() {
 		return vendas;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Produto other = (Produto) obj;
+		return Objects.equals(id, other.id);
 	}
 	
 }

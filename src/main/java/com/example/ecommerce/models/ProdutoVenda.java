@@ -8,12 +8,12 @@ public class ProdutoVenda {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
-	@JoinColumn(name = "produto_id")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "idProduto", nullable = false)
 	private Produto produto;
 
-	@ManyToOne
-	@JoinColumn(name = "venda_id")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "idVenda", nullable = false)
 	private Venda venda;
 
 	@Column(nullable = false)

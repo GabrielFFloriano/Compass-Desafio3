@@ -1,6 +1,5 @@
 package com.example.ecommerce.mapper;
 
-
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -17,6 +16,5 @@ public interface VendaMapper {
     @Mapping(target = "id", ignore = true)
     Venda toEntity(VendaDTO vendaDTO);
 
-	void updateFromDTO(VendaDTO vendaDTO, @MappingTarget Venda venda);
-
+    void updateFromDTO(VendaDTO vendaDTO, @MappingTarget Venda venda);
 }

@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.ecommerce.dtos.ProdutoDTO;
 import com.example.ecommerce.services.ProdutoService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/produtos")
 public class ProdutoController {
@@ -36,13 +38,13 @@ public class ProdutoController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<ProdutoDTO> criarProduto(@RequestBody ProdutoDTO produtoDTO){
+	public ResponseEntity<ProdutoDTO> criarProduto(@RequestBody @Valid ProdutoDTO produtoDTO){
 		ProdutoDTO produto = service.criar(produtoDTO);
 		return ResponseEntity.ok(produto);
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<ProdutoDTO> atualizarProduto(@PathVariable Long id, @RequestBody ProdutoDTO produtoDTO){
+	public ResponseEntity<ProdutoDTO> atualizarProduto(@PathVariable Long id, @RequestBody @Valid ProdutoDTO produtoDTO){
 		ProdutoDTO produto = service.atualizar(id, produtoDTO);
 		return ResponseEntity.ok(produto);
 	}

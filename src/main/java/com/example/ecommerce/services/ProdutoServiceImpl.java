@@ -1,5 +1,6 @@
 package com.example.ecommerce.services;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +28,11 @@ public class ProdutoServiceImpl implements ProdutoService {
 	@Override
 	@Transactional
 	public ProdutoDTO criar(ProdutoDTO produtoDTO) {
+		if (produtoDTO.preco().compareTo(BigDecimal.ZERO)<=0) {
+			throw new IllegalArgumentException("O preço do produto deve ser maior que zero");
+		}
 		Produto produto = mapper.toEntity(produtoDTO);
+		produto.setAtivo(true);
 		Produto salvo = repository.save(produto);
 		return mapper.toDTO(salvo);
 	}
@@ -37,6 +42,10 @@ public class ProdutoServiceImpl implements ProdutoService {
 	public ProdutoDTO atualizar(Long id, ProdutoDTO produtoDTO) {
 		Produto produto = repository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado com o ID: " + id));
+		if (produtoDTO.preco().compareTo(BigDecimal.ZERO)<=0) {
+			throw new IllegalArgumentException("O preço do produto deve ser maior que zero");
+		}
+		
 		mapper.updateFromDTO(produtoDTO, produto);
 		Produto atualizado = repository.save(produto);
 		return mapper.toDTO(atualizado);
@@ -54,12 +63,15 @@ public class ProdutoServiceImpl implements ProdutoService {
 	@Override
 	@Transactional
 	public void deletar(Long id) {
-		// TODO verificar se está numa venda
-		Produto produto = repository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Venda não encontrada com o ID: " + id));
-		repository.delete(produto);
+        Produto produto = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado: " + id));
 
-	}
+        if (!produto.getVendas().isEmpty()) {
+            throw new IllegalStateException("Produto não pode ser excluído porque está associado a uma venda.");
+        }
+
+        repository.delete(produto);
+    }
 
 	@Override
 	public ProdutoDTO obterPorId(Long id) {
