@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 import com.example.ecommerce.dtos.ProdutoDTO;
 import com.example.ecommerce.dtos.VendaDTO;
 import com.example.ecommerce.exceptions.ResourceNotFoundException;
-import com.example.ecommerce.mapper.ProdutoMapper;
 import com.example.ecommerce.mapper.VendaMapper;
 import com.example.ecommerce.models.Produto;
 import com.example.ecommerce.models.ProdutoVenda;
@@ -42,14 +40,9 @@ public class VendaServiceImpl implements VendaService {
     @Autowired
     private VendaMapper mapper;
 
-    @Autowired
-    private ProdutoMapper produtoMapper;
-
-    @Autowired
-    private CacheManager cacheManager;
-
     @Override
     @Transactional
+    @CacheEvict(value = "vendasCache", allEntries = true)
     public VendaDTO criar(VendaDTO vendaDTO) {
         if (vendaDTO.produtos() == null || vendaDTO.produtos().isEmpty()) {
             throw new IllegalArgumentException("Uma venda deve conter pelo menos um produto.");
@@ -70,10 +63,25 @@ public class VendaServiceImpl implements VendaService {
             Produto produto = produtos.stream().filter(p -> p.getId().equals(produtoDTO.id())).findFirst()
                     .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado: " + produtoDTO.id()));
 
-            int quantidade = vendaDTO.produtosQuantidade().get(produtoDTO.id());
+            if (vendaDTO.produtosQuantidade() == null) {
+                throw new IllegalArgumentException("A quantidade dos produtos não pode ser nula.");
+            }
+
+            Integer quantidade = vendaDTO.produtosQuantidade().get(produtoDTO.id());
+
+            if (quantidade == null) {
+                throw new IllegalArgumentException("A quantidade do produto " + produtoDTO.id() + " não pode ser nula.");
+            }
+
+            if (produto.getEstoque() < quantidade) {
+                throw new IllegalStateException("Estoque insuficiente para o produto: " + produto.getNome());
+            }
+            produto.setEstoque(produto.getEstoque() - quantidade);
+            produtoRepository.save(produto);
+            
             venda.addProduto(produto, quantidade);
 
-            BigDecimal subTotal = produto.getPreco().multiply(BigDecimal.valueOf(quantidade));
+            BigDecimal subTotal = produto.isAtivo() ? produto.getPreco().multiply(BigDecimal.valueOf(quantidade)) : BigDecimal.ZERO;
             total = total.add(subTotal);
         }
         venda.setTotal(total);
@@ -81,12 +89,25 @@ public class VendaServiceImpl implements VendaService {
         return mapper.toDTO(salva);
     }
 
+
     @Override
     @Transactional
+    @CacheEvict(value = "vendasCache", allEntries = true)
     public VendaDTO atualizar(Long id, VendaDTO vendaDTO) {
         Venda venda = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Venda não encontrada com o ID: " + id));
 
+        if (vendaDTO.produtosQuantidade() != null) {
+            List<Long> produtoIds = vendaDTO.produtosQuantidade().keySet().stream().collect(Collectors.toList());
+            List<Produto> produtos = produtoRepository.findAllById(produtoIds);
+
+            for (Produto produto : produtos) {
+                if (!produto.isAtivo()) {
+                    throw new IllegalStateException("Produto inativo não pode ser utilizado na venda: " + produto.getNome());
+                }
+            }
+        }
+        
         if (vendaDTO.data() != null) {
             venda.setData(vendaDTO.data());
         }
@@ -139,6 +160,7 @@ public class VendaServiceImpl implements VendaService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "vendasCache", allEntries = true)
     public void deletar(Long id) {
         Venda venda = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Venda não encontrada com o ID: " + id));
@@ -146,12 +168,16 @@ public class VendaServiceImpl implements VendaService {
     }
 
     @Override
+    @Transactional
+    @Cacheable(value = "vendasCache")
     public VendaDTO obterPorId(Long id) {
         Venda venda = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Venda não encontrada"));
         return mapper.toDTO(venda);
     }
 
     @Override
+    @Transactional
+    @Cacheable(value = "vendasCache")
     public List<VendaDTO> listar() {
         List<Venda> vendas = repository.findAll();
         return vendas.stream().map(mapper::toDTO).collect(Collectors.toList());
@@ -186,9 +212,4 @@ public class VendaServiceImpl implements VendaService {
         return vendas.stream().map(mapper::toDTO).collect(Collectors.toList());
     }
 
-    @Override
-    @CacheEvict(value = "vendasCache", allEntries = true)
-    public void limparCacheVendas() {
-        cacheManager.getCache("vendasCache").clear();
-    }
 }

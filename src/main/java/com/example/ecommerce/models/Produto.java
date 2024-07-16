@@ -47,7 +47,7 @@ public class Produto {
 
     @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<ProdutoVenda> vendas = new HashSet<>();
-    
+
 	public Long getId() {
 		return id;
 	}

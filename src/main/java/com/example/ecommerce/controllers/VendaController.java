@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.ecommerce.dtos.VendaDTO;
-import com.example.ecommerce.models.Venda;
 import com.example.ecommerce.services.VendaService;
 
 @RestController

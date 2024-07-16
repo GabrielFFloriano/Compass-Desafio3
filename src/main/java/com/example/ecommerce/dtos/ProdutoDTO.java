@@ -1,5 +1,6 @@
 package com.example.ecommerce.dtos;
 import java.math.BigDecimal;
+import java.util.Set;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -23,6 +24,8 @@ public record ProdutoDTO(
     boolean ativo,
     
     @Min(value = 0, message = "Estoque do produto não pode ser negativo")
-    Integer estoque
+    Integer estoque,
+    
+    Set<Long> vendas
 ) {
 }

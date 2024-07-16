@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.List;
 
 import com.example.ecommerce.dtos.VendaDTO;
-import com.example.ecommerce.models.Venda;
 
 public interface VendaService {
 	VendaDTO criar(VendaDTO vendaDTO);
@@ -15,5 +14,4 @@ public interface VendaService {
     List<VendaDTO> filtrarVendasPorData(Instant startDate, Instant endDate);
     List<VendaDTO> gerarRelatorioSemanal();
     List<VendaDTO> gerarRelatorioMensal();
-	void limparCacheVendas();
 }
