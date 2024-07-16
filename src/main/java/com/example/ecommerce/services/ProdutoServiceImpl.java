@@ -65,21 +65,25 @@ public class ProdutoServiceImpl implements ProdutoService {
 	@Transactional
 	@CacheEvict(value = "produtosCache", allEntries = true)
 	public void mudarStatus(Long id) {
-		Produto produto = repository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado com ID: " + id));
-		produto.setAtivo(!produto.isAtivo());
-		List<Venda> vendas = vendaRepository.findByProdutosId(id);
-		for (Venda venda : vendas) {
-			BigDecimal total = venda.getProdutos().stream().map(vendaProduto -> {
-				Produto prod = vendaProduto.getProduto();
-				int quantidade = vendaProduto.getQuantidade();
-				return prod.isAtivo() ? prod.getPreco().multiply(BigDecimal.valueOf(quantidade)) : BigDecimal.ZERO;
-			}).reduce(BigDecimal.ZERO, BigDecimal::add);
-			venda.setTotal(total);
-			vendaRepository.save(venda);
-		}
-		repository.save(produto);
+	    Produto produto = repository.findById(id)
+	            .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado com ID: " + id));
+	    produto.setAtivo(!produto.isAtivo());
+
+	    List<Venda> vendas = vendaRepository.findByProdutosId(id);
+
+	    for (Venda venda : vendas) {
+	        BigDecimal total = venda.getProdutos().stream().map(vendaProduto -> {
+	            Produto prod = vendaProduto.getProduto();
+	            int quantidade = vendaProduto.getQuantidade();
+	            return prod.isAtivo() ? prod.getPreco().multiply(BigDecimal.valueOf(quantidade)) : BigDecimal.ZERO;
+	        }).reduce(BigDecimal.ZERO, BigDecimal::add);
+	        
+	        venda.setTotal(total);
+	        vendaRepository.save(venda);
+	    }
+	    repository.save(produto);
 	}
+
 
 	@Override
 	@Transactional

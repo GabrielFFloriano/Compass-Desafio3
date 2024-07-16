@@ -24,7 +24,7 @@ public class Venda {
 	@Column(nullable = false, updatable = false)
 	private Instant data = Instant.now();
 
-	@OneToMany(mappedBy = "venda", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "venda", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	private Set<ProdutoVenda> produtos = new HashSet<>();
 
 

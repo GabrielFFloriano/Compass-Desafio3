@@ -164,6 +164,14 @@ public class VendaServiceImpl implements VendaService {
     public void deletar(Long id) {
         Venda venda = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Venda não encontrada com o ID: " + id));
+        for (ProdutoVenda produtoVenda : venda.getProdutos()) {
+            Produto produto = produtoVenda.getProduto();
+            int quantidadeVendida = produtoVenda.getQuantidade();
+            produto.setEstoque(produto.getEstoque() + quantidadeVendida);
+            produto.getVendas().remove(produtoVenda);
+            produtoRepository.save(produto);
+        }
+        venda.getProdutos().clear();
         repository.delete(venda);
     }
 
