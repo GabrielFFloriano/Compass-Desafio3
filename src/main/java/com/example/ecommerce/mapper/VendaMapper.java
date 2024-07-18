@@ -15,18 +15,21 @@ import com.example.ecommerce.models.Produto;
 import com.example.ecommerce.models.ProdutoVenda;
 import com.example.ecommerce.models.Venda;
 
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE, uses = { ProdutoMapper.class, UsuarioMapper.class })
 public interface VendaMapper {
 
     @Mapping(target = "produtos", source = "produtos", qualifiedByName = "mapProdutoVendaSetToProdutoDTOSet")
     @Mapping(target = "produtosQuantidade", source = "produtos", qualifiedByName = "mapProdutoVendaSetToQuantidadeMap")
+    @Mapping(source = "usuario.id", target = "usuarioId")
     VendaDTO toDTO(Venda venda);
 
     @Mapping(target = "id", ignore = true) 
     @Mapping(target = "produtos", source = "produtos", qualifiedByName = "mapProdutoDTOSetToProdutoVendaSet")
+    @Mapping(source = "usuarioId", target = "usuario.id")
     Venda toEntity(VendaDTO vendaDTO);
 
     @Mapping(target = "produtos", ignore = true)
+    @Mapping(source = "usuarioId", target = "usuario.id")
     void updateFromDTO(VendaDTO vendaDTO, @MappingTarget Venda venda);
 
     @Named("mapProdutoVendaToProdutoDTO")

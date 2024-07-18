@@ -100,6 +100,7 @@ public class ProdutoServiceImpl implements ProdutoService {
 	}
 
 	@Override
+	@Transactional
 	@Cacheable(value = "produtosCache", key = "#id")
 	public ProdutoDTO obterPorId(Long id) {
 		Produto produto = repository.findById(id)
@@ -108,6 +109,7 @@ public class ProdutoServiceImpl implements ProdutoService {
 	}
 
 	@Override
+	@Transactional
 	@Cacheable(value = "produtosCache")
 	public List<ProdutoDTO> listar() {
 		List<Produto> produtos = repository.findAll();

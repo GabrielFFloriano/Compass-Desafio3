@@ -16,7 +16,9 @@ public record VendaDTO(
     Map<Long, Integer> produtosQuantidade,
     
     @DecimalMin(value = "0.01", message = "Preço do produto deve ser positivo")
-    BigDecimal total
+    BigDecimal total,
+    
+    Long usuarioId 
     
 ) {
 }

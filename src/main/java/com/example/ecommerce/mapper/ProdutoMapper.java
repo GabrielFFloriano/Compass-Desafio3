@@ -13,7 +13,7 @@ import com.example.ecommerce.dtos.ProdutoDTO;
 import com.example.ecommerce.models.Produto;
 import com.example.ecommerce.models.ProdutoVenda;
 
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE, uses = {VendaMapper.class, UsuarioMapper.class})
 public interface ProdutoMapper {
 
     @Mapping(target = "vendas", source = "vendas", qualifiedByName = "toProdutoVendas")

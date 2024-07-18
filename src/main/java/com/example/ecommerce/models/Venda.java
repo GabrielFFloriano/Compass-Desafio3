@@ -64,6 +64,14 @@ public class Venda {
 		this.total = total;
 	}
 
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(id);
